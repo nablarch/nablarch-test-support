@@ -14,5 +14,11 @@
   <!-- データベース接続失敗判定 -->
   <component name="dbAccessExceptionFactory" class="nablarch.core.db.connection.exception.BasicDbAccessExceptionFactory">
   </component>
+  
+  <component class="com.microsoft.sqlserver.jdbc.SQLServerXADataSource" name="xaDataSource">
+    <property name="user" value="${db.user}" />
+    <property name="password" value="${db.password}" />
+    <property name="url" value="${db.url}" />
+  </component>
 
 </component-configuration>

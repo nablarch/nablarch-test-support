@@ -1,5 +1,6 @@
 package nablarch.test.support.db.datasource;
 
+import java.sql.Connection;
 import java.util.Properties;
 
 import javax.sql.DataSource;
@@ -20,6 +21,8 @@ public class DataSourceFactory implements ComponentFactory<DataSource> {
     
     private String driverClassName;
 
+    private DbInitializer dbInitializer;
+
     @Override
     public synchronized DataSource createObject() {
 
@@ -28,6 +31,7 @@ public class DataSourceFactory implements ComponentFactory<DataSource> {
         }
 
         try {
+            
             Properties properties = new Properties();
             properties.setProperty("driverClassName", driverClassName);
             properties.setProperty("username", user);
@@ -37,6 +41,14 @@ public class DataSourceFactory implements ComponentFactory<DataSource> {
             properties.setProperty("maxActive", "30");
             properties.setProperty("timeBetweenEvictionRunsMillis", "5000");
             dataSource = BasicDataSourceFactory.createDataSource(properties);
+            final Connection connection = dataSource.getConnection();
+            try {
+                if (dbInitializer != null) {
+                    dbInitializer.initialize(connection);
+                }
+            } finally {
+                connection.close();
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -57,6 +69,10 @@ public class DataSourceFactory implements ComponentFactory<DataSource> {
 
     public void setDriverClassName(final String driverClassName) {
         this.driverClassName = driverClassName;
+    }
+
+    public void setDbInitializer(final DbInitializer dbInitializer) {
+        this.dbInitializer = dbInitializer;
     }
 }
 

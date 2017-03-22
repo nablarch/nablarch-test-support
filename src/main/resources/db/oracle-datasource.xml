@@ -19,5 +19,11 @@
   <!-- データベースアクセス例外用の設定 -->
   <component name="dbExceptionFactory"
       class="nablarch.core.db.statement.exception.BasicSqlStatementExceptionFactory" />
+  
+  <component class="oracle.jdbc.xa.client.OracleXADataSource" name="xaDataSource">
+    <property name="user" value="${db.user}" />
+    <property name="password" value="${db.password}" />
+    <property name="URL" value="${db.url}" />
+  </component>
 </component-configuration>
 
