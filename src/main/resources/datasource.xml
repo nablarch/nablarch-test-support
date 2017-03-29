@@ -15,13 +15,14 @@
   <component name="dialect" class="nablarch.core.db.dialect.H2Dialect" />
 
   <!-- データベース接続失敗判定 -->
-  <component name="dbAccessExceptionFactory" class="nablarch.core.db.connection.exception.BasicDbAccessExceptionFactory">
+  <component name="dbAccessExceptionFactory"
+      class="nablarch.core.db.connection.exception.BasicDbAccessExceptionFactory">
   </component>
 
-    <component name="xaDataSource" class="org.h2.jdbcx.JdbcDataSource">
-      <property name="user" value="${db.user}" />
-      <property name="password" value="${db.password}" />
-      <property name="url" value="${db.url}" />
-    </component>
+  <component name="xaDataSource" class="org.h2.jdbcx.JdbcDataSource">
+    <property name="user" value="${db.user}" />
+    <property name="password" value="${db.password}" />
+    <property name="url" value="${db.url}" />
+  </component>
 </component-configuration>
 
