@@ -5,7 +5,7 @@ import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 
 /**
- * 抽象文字列Matcherクラス。<br/>
+ * 抽象文字列Matcherクラス。
  * 共通処理を実装する。
  */
 @Published(tag = "architect")
@@ -50,7 +50,7 @@ abstract class AbstractStringMatcher extends BaseMatcher<String> {
     }
 
     /**
-     * マッチするか判定する。<br/>
+     * マッチするか判定する。
      *
      * @param actual 実際の値
      * @return 判定結果

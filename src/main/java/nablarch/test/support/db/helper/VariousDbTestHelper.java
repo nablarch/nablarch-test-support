@@ -73,7 +73,7 @@ public class VariousDbTestHelper {
     /**
      * 初期化処理を行う。
      *
-     * @param container
+     * @param container コンテナ
      */
     public static void initialize(DiContainer container) {
 
@@ -268,10 +268,11 @@ public class VariousDbTestHelper {
     }
 
     /**
-     * テーブルのセットアップを行う。<br />
+     * テーブルのセットアップを行う。
      * 空の場合はtruncateを使用してください。
      *
      * @param entities 登録するエンティティ
+     * @param <T> エンティティの型
      */
     public static <T> void setUpTable(T... entities) {
         if (entities.length == 0) {
@@ -327,6 +328,9 @@ public class VariousDbTestHelper {
      * レコードを主キー検索する。
      *
      * @param entityClass Entityクラス
+     * @param ids ID
+     * @param <T> Entityの型
+     * @return 検索結果
      */
     public static <T> T findById(Class<T> entityClass, Object... ids) {
         return em.find(entityClass, Arrays.asList(ids), new HashMap<String, Object>() {{
@@ -339,6 +343,8 @@ public class VariousDbTestHelper {
      *
      * @param entityClass Entityクラス
      * @param orderBy ソート対象のカラム名
+     * @param <T> Entityの型
+     * @return 検索結果
      */
     public static <T> List<T> findAll(Class<T> entityClass, String... orderBy) {
 
@@ -379,6 +385,8 @@ public class VariousDbTestHelper {
      * レコードを全件検索する。
      *
      * @param entityClass Entityクラス
+     * @param <T> Entityの型
+     * @return 検索結果
      */
     public static <T> List<T> findAll(Class<T> entityClass) {
         return findAll(entityClass, (String[]) null);
@@ -388,7 +396,7 @@ public class VariousDbTestHelper {
     /**
      * DIコンテナからDataSourceオブジェクトを取得する。
      *
-     * @param container
+     * @param container コンテナ
      * @return DataSourceオブジェクト
      */
     private static DataSource getDataSource(DiContainer container) {

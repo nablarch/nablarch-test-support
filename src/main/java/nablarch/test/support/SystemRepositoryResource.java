@@ -13,7 +13,7 @@ import org.junit.rules.ExternalResource;
 
 /**
  * システムリポジトリの初期化及び破棄を行うルール実装。
- * <p/>
+ *
  * このクラスは、初期処理でコンストラクタで指定されたXMLファイルを元にSystemRepositoryを構築する。
  * 後処理では、構築したSystemRepositoryの情報を破棄する。
  */
@@ -32,7 +32,7 @@ public class SystemRepositoryResource extends ExternalResource {
     /**
      * 指定されたパスのリポジトリを構築する。
      *
-     * @throws Throwable
+     * @throws Throwable 例外・エラー
      */
     @Override
     protected void before() throws Throwable {
