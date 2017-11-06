@@ -4,11 +4,11 @@ import nablarch.core.util.annotation.Published;
 import org.hamcrest.BaseMatcher;
 
 /**
- * 改行コードの種類を無視するorg.hamcrest.Matcher実装クラス。<br/>
- * <pre><code>
+ * 改行コードの種類を無視するorg.hamcrest.Matcher実装クラス。
+ * <pre>{@code
  * assertThat("foo\r\n", IgnoringLS.equals("foo\r")); //--> success
  * assertThat("foo\r\n", IgnoringLS.equals("foo"));   //--> fail
- * </code></pre>
+ * }</pre>
  * @author T.Kawasaki
  */
 @Published
@@ -44,7 +44,7 @@ public final class IgnoringLS {
     }
 
     /**
-     * 改行の種類以外が等しいことを表明するMatcherクラス。<br/>
+     * 改行の種類以外が等しいことを表明するMatcherクラス。
      *
      * @author T.Kawasaki
      */
@@ -69,7 +69,7 @@ public final class IgnoringLS {
 
     /**
      * 改行コードの種類を無視して、実際の値が期待値を含むことを
-     * 表明するMatcherクラス。<br/>
+     * 表明するMatcherクラス。
      *
      * @author T.Kawasaki
      */

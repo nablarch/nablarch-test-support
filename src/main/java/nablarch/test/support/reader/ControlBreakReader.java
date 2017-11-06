@@ -16,9 +16,9 @@ import nablarch.fw.ExecutionContext;
  * 変更が発生した時点でバッファリングしていたデータをまとめて返す。
  * </p>
  * <p>
- * 本クラスのパラメータ<D>には、元となるデータリーダのデータの型を指定すること。
+ * 本クラスのパラメータ{@code <D>}には、元となるデータリーダのデータの型を指定すること。
  * </p>
- * <p>
+ *
  * 実装例を以下に示す。
  * <pre>
  * {@code
@@ -27,7 +27,7 @@ import nablarch.fw.ExecutionContext;
  * reader.setSourceDataReader(dbReader);
  * }
  * </pre>
- * </p>
+ *
  * @param <D> 元となるデータリーダのデータの型
  * @author Iwauo Tajima
  */
@@ -114,13 +114,13 @@ extends AggregatingDataReader<D> {
     }
     
     /**
-     * 値の変更を監視するキーを設定する。<br/>
-     * キーは複数設定することができ、設定した順番で値の変更が監視される。<br/>
+     * 値の変更を監視するキーを設定する。
+     * キーは複数設定することができ、設定した順番で値の変更が監視される。
      * 使用例を以下に示す。
-     * <pre>
+     * <pre>{@code
      * ControlBreakReader<SqlRow> reader = new ControlBreakReader<SqlRow>();
      * reader.setWatchedKeys("userId", "itemId"); // ユーザID、商品IDの順番で値の変更を監視する。
-     * </pre>
+     * }</pre>
      * @param watchedKeys 値の変更を監視するキーのリスト
      * @return このオブジェクト自体
      */
