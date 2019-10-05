@@ -5,12 +5,12 @@ import java.util.Properties;
 
 import javax.sql.DataSource;
 
+import nablarch.core.util.StringUtil;
 import org.apache.commons.dbcp.BasicDataSourceFactory;
 
 import nablarch.core.repository.di.ComponentFactory;
 
 public class DataSourceFactory implements ComponentFactory<DataSource> {
-
     private static DataSource dataSource = null;
 
     private String user;
@@ -22,6 +22,8 @@ public class DataSourceFactory implements ComponentFactory<DataSource> {
     private String driverClassName;
 
     private DbInitializer dbInitializer;
+
+    private String connectionProperties;
 
     @Override
     public synchronized DataSource createObject() {
@@ -40,6 +42,9 @@ public class DataSourceFactory implements ComponentFactory<DataSource> {
             properties.setProperty("initialSize", "2");
             properties.setProperty("maxActive", "30");
             properties.setProperty("timeBetweenEvictionRunsMillis", "5000");
+            if (StringUtil.hasValue(connectionProperties)) {
+                properties.setProperty("connectionProperties", connectionProperties);
+            }
             dataSource = BasicDataSourceFactory.createDataSource(properties);
             final Connection connection = dataSource.getConnection();
             try {
@@ -73,6 +78,10 @@ public class DataSourceFactory implements ComponentFactory<DataSource> {
 
     public void setDbInitializer(final DbInitializer dbInitializer) {
         this.dbInitializer = dbInitializer;
+    }
+
+    public void setConnectionProperties(String connectionProperties) {
+        this.connectionProperties = connectionProperties;
     }
 }
 
