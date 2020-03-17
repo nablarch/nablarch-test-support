@@ -91,16 +91,4 @@
     </dependency>
 
   </dependencies>
-    <distributionManagement>
-  <repository>
-    <id>nexus</id>
-    <url>https://bisco.adc-tis.com/nexus/repository/maven-releases/</url>
-              <releases>
-            <enabled>true</enabled>
-          </releases>
-          <snapshots>
-            <enabled>false</enabled>
-          </snapshots>
-  </repository>
-</distributionManagement>
 </project>
