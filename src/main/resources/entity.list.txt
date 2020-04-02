@@ -97,3 +97,5 @@ nablarch.common.web.session.batch.VersatileBatchRequest
 nablarch.common.web.session.store.UserSession
 nablarch.common.web.session.store.ChangeUserSession
 nablarch.fw.handler.BasicDuplicateProcessCheckerTest$BatchProcess
+nablarch.common.web.token.Token
+nablarch.common.web.token.AnotherToken

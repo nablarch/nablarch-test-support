@@ -14,7 +14,7 @@ public final class WebTestUtil {
     public static final String CONTEXT_PATH = "/nablarch_test";
     
     /**
-     *  MockServletResponse で encodeURL した際に付与するサフィックス。<br/>
+     *  MockServletResponse で encodeURL した際に付与するサフィックス。
      *  HttpServletResponse#encodeURL が呼ばれたかどうかの確認に使用する。
      */
     public static final String ENCODE_URL_SUFFIX = "_encode_suffix";

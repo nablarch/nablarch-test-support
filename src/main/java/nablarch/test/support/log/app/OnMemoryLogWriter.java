@@ -3,13 +3,7 @@ package nablarch.test.support.log.app;
 import nablarch.core.log.basic.LogWriterSupport;
 import nablarch.core.util.Builder;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class OnMemoryLogWriter extends LogWriterSupport {
     
@@ -18,10 +12,23 @@ public class OnMemoryLogWriter extends LogWriterSupport {
     public static void clear() {
         messagesMap.clear();
     }
-    
-    public static List<String> getMessages(String name) {
+
+    /**
+     * メモリ中のログを取得する。
+     *
+     *  <p>
+     *  補足：
+     *  本メソッドは同期化している。<br />
+     *  テスト中で別プロセスを生成してテストする場合、プロセス生成側がログを取得するタイミングが悪いと、
+     *  新しく空のログを作成してしまうため。
+     *  </p>
+     *
+     * @param name ログ名
+     * @return ログ
+     */
+    public static synchronized List<String> getMessages(String name) {
         if (!messagesMap.containsKey(name)) {
-            messagesMap.put(name, new ArrayList<String>());
+            messagesMap.put(name, Collections.synchronizedList(new ArrayList<String>()));
         }
         return messagesMap.get(name);
     }

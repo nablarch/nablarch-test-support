@@ -5,6 +5,7 @@ import java.util.Properties;
 
 import javax.sql.DataSource;
 
+import nablarch.core.util.StringUtil;
 import org.apache.commons.dbcp.BasicDataSourceFactory;
 
 import nablarch.core.repository.di.ComponentFactory;
@@ -20,6 +21,10 @@ public class DataSourceFactory implements ComponentFactory<DataSource> {
     private String url;
     
     private String driverClassName;
+
+    private String initialSize = "2";
+
+    private String maxIdle;
 
     private DbInitializer dbInitializer;
 
@@ -37,8 +42,12 @@ public class DataSourceFactory implements ComponentFactory<DataSource> {
             properties.setProperty("username", user);
             properties.setProperty("password", password);
             properties.setProperty("url", url);
-            properties.setProperty("initialSize", "2");
+            properties.setProperty("initialSize", initialSize);
             properties.setProperty("maxActive", "30");
+            if (StringUtil.hasValue(maxIdle)) {
+                properties.setProperty("maxIdle", maxIdle);
+            }
+
             properties.setProperty("timeBetweenEvictionRunsMillis", "5000");
             dataSource = BasicDataSourceFactory.createDataSource(properties);
             final Connection connection = dataSource.getConnection();
@@ -65,6 +74,14 @@ public class DataSourceFactory implements ComponentFactory<DataSource> {
 
     public void setUrl(String url) {
         this.url = url;
+    }
+
+    public void setInitialSize(String initialSize) {
+        this.initialSize = initialSize;
+    }
+
+    public void setMaxIdle(String maxIdle) {
+        this.maxIdle = maxIdle;
     }
 
     public void setDriverClassName(final String driverClassName) {

@@ -1,6 +1,11 @@
 nablarch-test-support
 ======================
 
+| master | develop |
+|:-----------|:------------|
+|[![Build Status](https://travis-ci.org/nablarch/nablarch-test-support.svg?branch=master)](https://travis-ci.org/nablarch/nablarch-test-support)|[![Build Status](https://travis-ci.org/nablarch/nablarch-test-support.svg?branch=develop)](https://travis-ci.org/nablarch/nablarch-test-support)|
+
+
 Nablarchモジュールのテストで必要な共通処理をまとめています。
 
 既存のテストで使用しているnablarch-all-test及びnablarch-toolboxの処理を切り出しています。
@@ -13,18 +18,27 @@ Nablarchモジュールのテストで必要な共通処理をまとめていま
     test.support.db.helper.DatabaseTestRunner -> nablarch.test.support.db.helper.DatabaseTestRunner
     nablarch.tool.Hereis -> nablarch.test.support.tool.Hereis
 
-## 依存ライブラリ
+## 各種DBでのテスト
 
-本モジュールのコンパイルまたはテストには、下記ライブラリを手動でローカルリポジトリへインストールする必要があります。
+Nablarchのテストを、デフォルトのH2以外のデータベースでテストをしたい場合の手順を記載します。
 
-ライブラリ          |ファイル名       |グループID     |アーティファクトID   |バージョン   |
-:-------------------|:----------------|:--------------|:--------------------|:------------|
-Oracle JDBC Driver  |ojdbc6.jar       |com.oracle     |ojdbc6               |11.2.0.2.0   |
-Oracle UCP for JDBC |ucp.jar          |com.oracle     |ucp                  |11.2.0.3.0   |
+### DB設定変更
 
-上記ライブラリは、下記コマンドでインストールしてください。
+本モジュールの以下のリソースをコピーして、テスト対象モジュールに同じように配置します。
 
+- src/main/resources/datasource.xml
+- src/main/resources/db.config
+
+上記ファイルの記載内容を、テストに使用したいDBの情報に書き換えます。
+
+### JDBCドライバのインストール
+
+テストしたいデータベースのJDBCドライバをローカルリポジトリへインストールします。
 
 ```
 mvn install:install-file -Dfile=<ファイル名> -DgroupId=<グループID> -DartifactId=<アーティファクトID> -Dversion=<バージョン> -Dpackaging=jar
 ```
+
+### JDBCドライバのdependency設定
+
+pom.xmlのdependenciesセクションに、先にインストールしたJDBCドライバをtestスコープで追記します。
