@@ -5,7 +5,7 @@
 
   <groupId>com.nablarch.dev</groupId>
   <artifactId>nablarch-test-support</artifactId>
-  <version>5-NEXT-SNAPSHOT</version>
+  <version>0.2.1</version>
 
   <scm>
     <connection>scm:git:git://github.com/nablarch/${project.artifactId}.git</connection>
@@ -16,7 +16,7 @@
   <parent>
     <groupId>com.nablarch</groupId>
     <artifactId>nablarch-parent</artifactId>
-    <version>5-NEXT-SNAPSHOT</version>
+    <version>5u19</version>
   </parent>
 
   <dependencies>
