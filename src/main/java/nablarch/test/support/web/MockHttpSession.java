@@ -1,6 +1,6 @@
 package nablarch.test.support.web;
 
-import javax.servlet.ServletContext;
+import jakarta.servlet.ServletContext;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
@@ -10,7 +10,7 @@ import java.util.Vector;
 /**
  * @author Kiyohito Itoh
  */
-public class MockHttpSession implements javax.servlet.http.HttpSession {
+public class MockHttpSession implements jakarta.servlet.http.HttpSession {
     
     private String id;
     private ServletContext servletContext;
@@ -80,7 +80,7 @@ public class MockHttpSession implements javax.servlet.http.HttpSession {
      * {@inheritDoc}
      * @deprecated
      */
-    public javax.servlet.http.HttpSessionContext getSessionContext() {
+    public jakarta.servlet.http.HttpSessionContext getSessionContext() {
         throw new UnsupportedOperationException();
     }
 
