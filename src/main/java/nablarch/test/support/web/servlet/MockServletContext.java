@@ -1,13 +1,21 @@
 package nablarch.test.support.web.servlet;
 
-import javax.servlet.RequestDispatcher;
-import javax.servlet.Servlet;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
+import jakarta.servlet.Filter;
+import jakarta.servlet.FilterRegistration;
+import jakarta.servlet.RequestDispatcher;
+import jakarta.servlet.Servlet;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletRegistration;
+import jakarta.servlet.SessionCookieConfig;
+import jakarta.servlet.SessionTrackingMode;
+import jakarta.servlet.descriptor.JspConfigDescriptor;
+
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Enumeration;
+import java.util.EventListener;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -44,6 +52,11 @@ public class MockServletContext implements ServletContext {
         throw new UnsupportedOperationException();
     }
 
+    @Override
+    public boolean setInitParameter(String s, String s1) {
+        throw new UnsupportedOperationException();
+    }
+
     public int getMajorVersion() {
         throw new UnsupportedOperationException();
     }
@@ -53,6 +66,16 @@ public class MockServletContext implements ServletContext {
     }
 
     public int getMinorVersion() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public int getEffectiveMajorVersion() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public int getEffectiveMinorVersion() {
         throw new UnsupportedOperationException();
     }
 
@@ -89,6 +112,161 @@ public class MockServletContext implements ServletContext {
     }
 
     public String getServletContextName() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public ServletRegistration.Dynamic addServlet(String s, String s1) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public ServletRegistration.Dynamic addServlet(String s, Servlet servlet) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public ServletRegistration.Dynamic addServlet(String s, Class<? extends Servlet> aClass) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public ServletRegistration.Dynamic addJspFile(String s, String s1) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public <T extends Servlet> T createServlet(Class<T> aClass) throws ServletException {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public ServletRegistration getServletRegistration(String s) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Map<String, ? extends ServletRegistration> getServletRegistrations() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public FilterRegistration.Dynamic addFilter(String s, String s1) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public FilterRegistration.Dynamic addFilter(String s, Filter filter) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public FilterRegistration.Dynamic addFilter(String s, Class<? extends Filter> aClass) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public <T extends Filter> T createFilter(Class<T> aClass) throws ServletException {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public FilterRegistration getFilterRegistration(String s) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Map<String, ? extends FilterRegistration> getFilterRegistrations() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public SessionCookieConfig getSessionCookieConfig() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void setSessionTrackingModes(Set<SessionTrackingMode> set) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Set<SessionTrackingMode> getDefaultSessionTrackingModes() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Set<SessionTrackingMode> getEffectiveSessionTrackingModes() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void addListener(String s) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public <T extends EventListener> void addListener(T t) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void addListener(Class<? extends EventListener> aClass) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public <T extends EventListener> T createListener(Class<T> aClass) throws ServletException {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public JspConfigDescriptor getJspConfigDescriptor() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public ClassLoader getClassLoader() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void declareRoles(String... strings) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public String getVirtualServerName() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public int getSessionTimeout() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void setSessionTimeout(int i) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public String getRequestCharacterEncoding() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void setRequestCharacterEncoding(String s) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public String getResponseCharacterEncoding() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void setResponseCharacterEncoding(String s) {
         throw new UnsupportedOperationException();
     }
 

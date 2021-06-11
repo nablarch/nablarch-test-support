@@ -7,15 +7,15 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
-import javax.persistence.Column;
-import javax.persistence.EntityManager;
-import javax.persistence.FlushModeType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.Transient;
-import javax.persistence.spi.PersistenceUnitTransactionType;
+import jakarta.persistence.Column;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.FlushModeType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.Table;
+import jakarta.persistence.Temporal;
+import jakarta.persistence.Transient;
+import jakarta.persistence.spi.PersistenceUnitTransactionType;
 import javax.sql.DataSource;
 
 import org.eclipse.persistence.internal.jpa.config.persistenceunit.PersistenceUnitImpl;
@@ -334,7 +334,7 @@ public class VariousDbTestHelper {
      */
     public static <T> T findById(Class<T> entityClass, Object... ids) {
         return em.find(entityClass, Arrays.asList(ids), new HashMap<String, Object>() {{
-            put("javax.persistence.cache.storeMode", "REFRESH");
+            put("jakarta.persistence.cache.storeMode", "REFRESH");
         }});
     }
 
@@ -377,7 +377,7 @@ public class VariousDbTestHelper {
         }
 
         return em.createNativeQuery(selectQuery + orderByQuery, entityClass)
-                .setHint("javax.persistence.cache.storeMode", "REFRESH")
+                .setHint("jakarta.persistence.cache.storeMode", "REFRESH")
                 .getResultList();
     }
 

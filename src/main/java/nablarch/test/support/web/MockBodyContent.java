@@ -1,6 +1,6 @@
 package nablarch.test.support.web;
 
-import javax.servlet.jsp.tagext.BodyContent;
+import jakarta.servlet.jsp.tagext.BodyContent;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
