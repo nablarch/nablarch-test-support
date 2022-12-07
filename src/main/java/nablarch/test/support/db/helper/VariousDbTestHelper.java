@@ -1,11 +1,17 @@
 package nablarch.test.support.db.helper;
 
-import java.lang.reflect.Field;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
+import nablarch.core.db.connection.ConnectionFactory;
+import nablarch.core.repository.di.DiContainer;
+import nablarch.core.util.StringUtil;
+import org.eclipse.persistence.internal.jpa.config.persistenceunit.PersistenceUnitImpl;
+import org.eclipse.persistence.internal.jpa.deployment.SEPersistenceUnitInfo;
+import org.eclipse.persistence.jpa.JpaHelper;
+import org.eclipse.persistence.jpa.config.PersistenceUnit;
+import org.eclipse.persistence.jpa.config.RuntimeFactory;
+import org.eclipse.persistence.sessions.DatabaseSession;
+import org.eclipse.persistence.tools.schemaframework.FieldDefinition;
+import org.eclipse.persistence.tools.schemaframework.SchemaManager;
+import org.eclipse.persistence.tools.schemaframework.TableDefinition;
 
 import javax.persistence.Column;
 import javax.persistence.EntityManager;
@@ -17,20 +23,12 @@ import javax.persistence.Temporal;
 import javax.persistence.Transient;
 import javax.persistence.spi.PersistenceUnitTransactionType;
 import javax.sql.DataSource;
-
-import org.eclipse.persistence.internal.jpa.config.persistenceunit.PersistenceUnitImpl;
-import org.eclipse.persistence.internal.jpa.deployment.SEPersistenceUnitInfo;
-import org.eclipse.persistence.jpa.JpaHelper;
-import org.eclipse.persistence.jpa.config.PersistenceUnit;
-import org.eclipse.persistence.jpa.config.RuntimeFactory;
-import org.eclipse.persistence.sessions.DatabaseSession;
-import org.eclipse.persistence.tools.schemaframework.FieldDefinition;
-import org.eclipse.persistence.tools.schemaframework.SchemaManager;
-import org.eclipse.persistence.tools.schemaframework.TableDefinition;
-
-import nablarch.core.db.connection.ConnectionFactory;
-import nablarch.core.repository.di.DiContainer;
-import nablarch.core.util.StringUtil;
+import java.lang.reflect.Field;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
 
 public class VariousDbTestHelper {
 
@@ -315,6 +313,27 @@ public class VariousDbTestHelper {
             for (Object entity : array) {
                 em.merge(entity);
             }
+            em.getTransaction()
+                    .commit();
+        } catch (Exception e) {
+            em.getTransaction()
+                    .rollback();
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * レコードを削除する。
+     *
+     * @param entity Entityオブジェクト
+     *               findで取得したEntityManagerの管理下にあるオブジェクトを渡すこと。
+     *               newしたオブジェクトを渡した場合削除できません。
+     */
+    public static void delete(Object entity) {
+        em.getTransaction()
+                .begin();
+        try {
+            em.remove(entity);
             em.getTransaction()
                     .commit();
         } catch (Exception e) {
