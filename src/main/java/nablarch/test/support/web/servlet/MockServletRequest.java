@@ -61,7 +61,17 @@ public class MockServletRequest implements HttpServletRequest {
     public void setContextPath(String contextPath) {
         this.contextPath = contextPath;
     }
-    
+
+    private ServletContext servletContext;
+
+    /**
+     * {@link ServletContext}を設定する。
+     * @param servletContext {@link ServletContext}
+     */
+    public void setServletContext(ServletContext servletContext) {
+        this.servletContext = servletContext;
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -177,7 +187,7 @@ public class MockServletRequest implements HttpServletRequest {
 
     @Override
     public ServletContext getServletContext() {
-        throw new UnsupportedOperationException();
+        return servletContext;
     }
 
     @Override
