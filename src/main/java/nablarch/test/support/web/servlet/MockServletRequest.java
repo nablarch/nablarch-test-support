@@ -4,6 +4,7 @@ import jakarta.servlet.AsyncContext;
 import jakarta.servlet.DispatcherType;
 import jakarta.servlet.ReadListener;
 import jakarta.servlet.RequestDispatcher;
+import jakarta.servlet.ServletConnection;
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletInputStream;
@@ -60,7 +61,17 @@ public class MockServletRequest implements HttpServletRequest {
     public void setContextPath(String contextPath) {
         this.contextPath = contextPath;
     }
-    
+
+    private ServletContext servletContext;
+
+    /**
+     * {@link ServletContext}を設定する。
+     * @param servletContext {@link ServletContext}
+     */
+    public void setServletContext(ServletContext servletContext) {
+        this.servletContext = servletContext;
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -176,7 +187,7 @@ public class MockServletRequest implements HttpServletRequest {
 
     @Override
     public ServletContext getServletContext() {
-        throw new UnsupportedOperationException();
+        return servletContext;
     }
 
     @Override
@@ -206,6 +217,21 @@ public class MockServletRequest implements HttpServletRequest {
 
     @Override
     public DispatcherType getDispatcherType() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public String getRequestId() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public String getProtocolRequestId() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public ServletConnection getServletConnection() {
         throw new UnsupportedOperationException();
     }
 

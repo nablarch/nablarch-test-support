@@ -22,6 +22,16 @@ import java.util.Set;
 
 public class MockServletContext implements ServletContext {
 
+    private String contextPath;
+
+    /**
+     * コンテキストパスを設定する。
+     * @param contextPath コンテキストパス
+     */
+    public void setContextPath(String contextPath) {
+        this.contextPath = contextPath;
+    }
+
     public Object getAttribute(String arg0) {
         throw new UnsupportedOperationException();
     }
@@ -35,7 +45,7 @@ public class MockServletContext implements ServletContext {
     }
 
     public String getContextPath() {
-        throw new UnsupportedOperationException();
+        return contextPath;
     }
 
     private Map<String, String> initParams = new HashMap<String, String>();

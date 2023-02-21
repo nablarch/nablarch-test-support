@@ -80,14 +80,6 @@ public class MockHttpSession implements jakarta.servlet.http.HttpSession {
      * {@inheritDoc}
      * @deprecated
      */
-    public jakarta.servlet.http.HttpSessionContext getSessionContext() {
-        throw new UnsupportedOperationException();
-    }
-
-    /**
-     * {@inheritDoc}
-     * @deprecated
-     */
     public Object getValue(String arg0) {
         throw new UnsupportedOperationException();
     }
