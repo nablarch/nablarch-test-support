@@ -1,6 +1,10 @@
 package nablarch.test.support.reflection;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * リフレクションを使った処理を提供するユーティリティクラス。
@@ -32,7 +36,7 @@ public class ReflectionUtil {
     @SuppressWarnings("unchecked")
     public static <T> T getFieldValue(Object object, String fieldName) {
         try {
-            final Field field = getDeclaredField(object.getClass(), object, fieldName);
+            final Field field = obtainDeclaredField(object.getClass(), object, fieldName);
             if (!field.canAccess(object)) {
                 field.setAccessible(true);
             }
@@ -64,7 +68,7 @@ public class ReflectionUtil {
      */
     public static void setFieldValue(Object object, String fieldName, Object value) {
         try {
-            final Field field = getDeclaredField(object.getClass(), object, fieldName);
+            final Field field = obtainDeclaredField(object.getClass(), object, fieldName);
             if (!field.canAccess(object)) {
                 field.setAccessible(true);
             }
@@ -82,16 +86,88 @@ public class ReflectionUtil {
      * @return 取得した {@link Field} オブジェクト
      * @throws IllegalArgumentException フィールドが見つからない場合
      */
-    private static Field getDeclaredField(Class<?> clazz, Object object, String fieldName) {
+    private static Field obtainDeclaredField(Class<?> clazz, Object object, String fieldName) {
         try {
             return clazz.getDeclaredField(fieldName);
         } catch (NoSuchFieldException e) {
             final Class<?> superClass = clazz.getSuperclass();
             if (superClass == null) {
-                throw new IllegalArgumentException("The field 'unknownField' is not found in object (" + object + ").");
+                throw new IllegalArgumentException("The field '" + fieldName + "' is not found in object (" + object + ").");
             } else {
-                return getDeclaredField(superClass, object, fieldName);
+                return obtainDeclaredField(superClass, object, fieldName);
             }
+        }
+    }
+
+    /**
+     * 指定されたオブジェクトの指定された引数なしのメソッドを実行する。
+     * <p>
+     * このメソッドは、メソッドの可視性に関係なくメソッドを実行できる。<br>
+     * カプセル化を破壊し、クラス間の静的な依存関係が分からなくなるため、
+     * このメソッドの乱用は避けること<br>
+     * 極力このメソッドを使用しなくてもテストができるようにクラスを設計し、
+     * どうしても可視性を無視してメソッドを実行しなけばテストできない場合にのみ使用すること。
+     * </p>
+     * <p>
+     * 指定されたオブジェクトに指定されたメソッドが存在しない場合は、
+     * 親クラスを遡ってメソッドを探索する。
+     * </p>
+     *
+     * @param object メソッドを実行するオブジェクト
+     * @param methodName 実行するメソッドの名前
+     * @return メソッドの戻り値 ({@code void} の場合は {@code null} を返す)
+     * @param <T> 戻り値の型
+     */
+    public static <T> T invokeMethod(Object object, String methodName) {
+        return invokeMethod(object, methodName, List.of(), List.of());
+    }
+
+    /**
+     * 指定されたオブジェクトの指定されたメソッドを実行する。
+     * <p>
+     * このメソッドは、メソッドの可視性に関係なくメソッドを実行できる。<br>
+     * カプセル化を破壊し、クラス間の静的な依存関係が分からなくなるため、
+     * このメソッドの乱用は避けること<br>
+     * 極力このメソッドを使用しなくてもテストができるようにクラスを設計し、
+     * どうしても可視性を無視してメソッドを実行しなけばテストできない場合にのみ使用すること。
+     * </p>
+     * <p>
+     * 指定されたオブジェクトに指定されたメソッドが存在しない場合は、
+     * 親クラスを遡ってメソッドを探索する。
+     * </p>
+     * 
+     * @param object メソッドを実行するオブジェクト
+     * @param methodName 実行するメソッドの名前
+     * @param argTypes 引数の型のリスト
+     * @param args メソッドに渡す引数のリスト
+     * @return メソッドの戻り値 ({@code void} の場合は {@code null} を返す)
+     * @param <T> 戻り値の型
+     */
+    @SuppressWarnings("unchecked")
+    public static <T> T invokeMethod(Object object, String methodName, List<Class<?>> argTypes, List<Object> args) {
+        final Method method = obtainDeclaredMethod(object.getClass(), object, methodName, argTypes);
+        if (!method.canAccess(object)) {
+            method.setAccessible(true);
+        }
+        try {
+            return (T)method.invoke(object, args.toArray(Object[]::new));
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    
+    private static Method obtainDeclaredMethod(Class<?> clazz, Object object, String methodName, List<Class<?>> argTypes) {
+        try {
+            return clazz.getDeclaredMethod(methodName, argTypes.toArray(Class<?>[]::new));
+        } catch (NoSuchMethodException e) {
+            final Class<?> superclass = clazz.getSuperclass();
+            if (superclass != null) {
+                return obtainDeclaredMethod(superclass, object, methodName, argTypes);
+            }
+
+            final String argTypesText = argTypes.stream().map(Class::getName).collect(Collectors.joining(", "));
+            throw new IllegalArgumentException(
+                    "The method '" + methodName + "(" + argTypesText + ")' is not found in object (" + object + ").");
         }
     }
 
