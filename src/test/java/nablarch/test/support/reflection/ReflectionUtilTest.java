@@ -46,7 +46,7 @@ public class ReflectionUtilTest {
     }
 
     /**
-     * 指定されたフィールドが存在しない場合は例外がスローされること。
+     * getFieldValueで指定されたフィールドが存在しない場合は例外がスローされること。
      */
     @Test
     public void testGetFieldValueThrowsExceptionIfNotFoundField() {
@@ -54,6 +54,62 @@ public class ReflectionUtilTest {
 
         final IllegalArgumentException exception
                 = assertThrows(IllegalArgumentException.class, () -> ReflectionUtil.getFieldValue(parent, "unknownField"));
+
+        assertThat(exception.getMessage(), is("The field 'unknownField' is not found in object (" + parent + ")."));
+    }
+
+    /**
+     * 指定されたオブジェクトのフィールドに可視性に関係なく値が設定できること。
+     */
+    @Test
+    public void testSetFieldValue() {
+        final Parent parent = new Parent();
+        
+        ReflectionUtil.setFieldValue(parent, "publicField", "PUBLIC_FIELD");
+        ReflectionUtil.setFieldValue(parent, "protectedField", "PROTECTED_FIELD");
+        ReflectionUtil.setFieldValue(parent, "packagePrivateField", "PACKAGE_PRIVATE_FIELD");
+        ReflectionUtil.setFieldValue(parent, "privateField", "PRIVATE_FIELD");
+
+        assertThat(ReflectionUtil.getFieldValue(parent, "publicField"), is("PUBLIC_FIELD"));
+        assertThat(ReflectionUtil.getFieldValue(parent, "protectedField"), is("PROTECTED_FIELD"));
+        assertThat(ReflectionUtil.getFieldValue(parent, "packagePrivateField"), is("PACKAGE_PRIVATE_FIELD"));
+        assertThat(ReflectionUtil.getFieldValue(parent, "privateField"), is("PRIVATE_FIELD"));
+    }
+
+    /**
+     * サブクラスのフィールドに対してsetFieldValueを使ったときのテスト。
+     * <ul>
+     *   <li>オーバーライドされたフィールドに設定できること</li>
+     *   <li>親クラスのフィールドも設定できること</li>
+     * </ul>
+     */
+    @Test
+    public void testSetFieldValueAtSubClass() {
+        final Sub sub = new Sub();
+
+        ReflectionUtil.setFieldValue(sub, "publicField", "PUBLIC_FIELD");
+        ReflectionUtil.setFieldValue(sub, "protectedField", "PROTECTED_FIELD");
+        ReflectionUtil.setFieldValue(sub, "packagePrivateField", "PACKAGE_PRIVATE_FIELD");
+        ReflectionUtil.setFieldValue(sub, "privateField", "PRIVATE_FIELD");
+        ReflectionUtil.setFieldValue(sub, "parentOnlyField", "PARENT_ONLY_FIELD");
+
+        assertThat(ReflectionUtil.getFieldValue(sub, "publicField"), is("PUBLIC_FIELD"));
+        assertThat(ReflectionUtil.getFieldValue(sub, "protectedField"), is("PROTECTED_FIELD"));
+        assertThat(ReflectionUtil.getFieldValue(sub, "packagePrivateField"), is("PACKAGE_PRIVATE_FIELD"));
+        assertThat(ReflectionUtil.getFieldValue(sub, "privateField"), is("PRIVATE_FIELD"));
+        assertThat(ReflectionUtil.getFieldValue(sub, "parentOnlyField"), is("PARENT_ONLY_FIELD"));
+    }
+
+    /**
+     * setFieldValueで指定されたフィールドが存在しない場合は例外がスローされること。
+     */
+    @Test
+    public void testSetFieldValueThrowsExceptionIfNotFoundField() {
+        final Parent parent = new Parent();
+
+        final IllegalArgumentException exception
+                = assertThrows(IllegalArgumentException.class,
+                () -> ReflectionUtil.setFieldValue(parent, "unknownField", "value"));
 
         assertThat(exception.getMessage(), is("The field 'unknownField' is not found in object (" + parent + ")."));
     }
