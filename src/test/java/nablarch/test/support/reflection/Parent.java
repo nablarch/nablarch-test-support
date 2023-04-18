@@ -1,6 +1,12 @@
 package nablarch.test.support.reflection;
 
 public class Parent {
+    public static String PUBLIC_FIELD = "Parent#PUBLIC_FIELD";
+    protected static String PROTECTED_FIELD = "Parent#PROTECTED_FIELD";
+    static String PACKAGE_PRIVATE_FIELD = "Parent#PACKAGE_PRIVATE_FIELD";
+    private static String PRIVATE_FIELD = "Parent#PRIVATE_FIELD";
+    private static String PARENT_ONLY_FIELD = "Parent#PARENT_ONLY_FIELD";
+    
     public String publicField = "Parent#publicField";
     protected String protectedField = "Parent#protectedField";
     String packagePrivateField = "Parent#packagePrivateField";

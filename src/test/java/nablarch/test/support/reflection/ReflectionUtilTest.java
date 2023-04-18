@@ -1,6 +1,5 @@
 package nablarch.test.support.reflection;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 import java.lang.reflect.InvocationTargetException;
@@ -17,6 +16,33 @@ import static org.junit.Assert.assertThrows;
  * @author Tanaka Tomoyuki
  */
 public class ReflectionUtilTest {
+
+    /**
+     * 指定されたクラスで定義されたフィールドは可視性に関係なく全て取得できること。
+     */
+    @Test
+    public void testGetFieldValueForClassField() {
+        assertThat(ReflectionUtil.getFieldValue(Parent.class, "PUBLIC_FIELD"), is("Parent#PUBLIC_FIELD"));
+        assertThat(ReflectionUtil.getFieldValue(Parent.class, "PROTECTED_FIELD"), is("Parent#PROTECTED_FIELD"));
+        assertThat(ReflectionUtil.getFieldValue(Parent.class, "PACKAGE_PRIVATE_FIELD"), is("Parent#PACKAGE_PRIVATE_FIELD"));
+        assertThat(ReflectionUtil.getFieldValue(Parent.class, "PRIVATE_FIELD"), is("Parent#PRIVATE_FIELD"));
+    }
+
+    /**
+     * サブクラスのstaticフィールドに対してgetFieldValueを使ったときのテスト。
+     * <ul>
+     *   <li>オーバーライドされたフィールドはサブクラスの値が取得できること</li>
+     *   <li>親クラスのフィールドも取得できること</li>
+     * </ul>
+     */
+    @Test
+    public void testGetFieldValueForClassFieldAtSubClass() {
+        assertThat(ReflectionUtil.getFieldValue(Sub.class, "PUBLIC_FIELD"), is("Sub#PUBLIC_FIELD"));
+        assertThat(ReflectionUtil.getFieldValue(Sub.class, "PROTECTED_FIELD"), is("Sub#PROTECTED_FIELD"));
+        assertThat(ReflectionUtil.getFieldValue(Sub.class, "PACKAGE_PRIVATE_FIELD"), is("Sub#PACKAGE_PRIVATE_FIELD"));
+        assertThat(ReflectionUtil.getFieldValue(Sub.class, "PRIVATE_FIELD"), is("Sub#PRIVATE_FIELD"));
+        assertThat(ReflectionUtil.getFieldValue(Sub.class, "PARENT_ONLY_FIELD"), is("Parent#PARENT_ONLY_FIELD"));
+    }
 
     /**
      * 指定されたオブジェクトで定義されたフィールドは可視性に関係なく全て取得できること。
