@@ -1,5 +1,6 @@
 package nablarch.test.support.reflection;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -8,6 +9,18 @@ import java.util.stream.Collectors;
 
 /**
  * リフレクションを使った処理を提供するユーティリティクラス。
+ * <p>
+ * このクラスは、5uXXの頃にモックライブラリとして使っていたJMockitに組み込まれていた{@code Deencapsulation}を
+ * 置き換えるために作成された。<br>
+ * JMockitはjacocoと競合してJava 17でテストができなくなるため、6uXXでMockitoに置き換えられた。<br>
+ * その際、Mockitoには{@code Deencapsulation}に対応するものが無かったため、必要最小限の機能のみを
+ * 独自に実装したものがこのクラスになる。
+ * </p>
+ * <p>
+ * リフレクションを使うとクラス間の静的な依存関係が分からなくなり変更に脆くなる。
+ * このため、このクラスのメソッドは極力使用せず、また新規メソッドの追加も極力行わないようにすること。
+ * リフレクションを使わなくてもテストできるように、クラス設計の方を調整することを検討すること。
+ * </p>
  * 
  * @author Tanaka Tomoyuki
  */
@@ -207,6 +220,48 @@ public class ReflectionUtil {
                     "The method '" + methodName + "(" + argTypesText + ")' is not found in object (" + object + ").");
         }
     }
+
+    /**
+     * 指定したクラスのデフォルトコンストラクタを使ってインスタンスを生成して返す。
+     * <p>
+     * このメソッドは、コンストラクタの可視性に関係なくインスタンスを生成できる。<br>
+     * カプセル化を破壊し、クラス間の静的な依存関係が分からなくなるため、
+     * このメソッドの乱用は避けること<br>
+     * 極力このメソッドを使用しなくてもテストができるようにクラスを設計し、
+     * どうしても可視性を無視してコンストラクタを実行しなけばテストできない場合にのみ使用すること。
+     * </p>
+     * <p>
+     * デフォルトコンストラクタが非チェック例外をスローした場合は、その例外をそのままスローしなおす。
+     * また、デフォルトコンストラクタがチェック例外をスローした場合は、その例外を{@link RuntimeException}でラップしてスローしなおす。<br>
+     * この振る舞いは、このクラスの元となったJMockitの{@code Deencapsulation}に動きを合わせたためにそうなっている。
+     * </p>
+     * 
+     * @param clazz インスタンスを生成するクラス
+     * @return 生成されたインスタンス
+     * @param <T> 生成されるインスタンスの型
+     * @throws IllegalArgumentException デフォルトコンストラクタが存在しない場合
+     */
+    public static <T> T newInstance(Class<T> clazz) {
+        try {
+            final Constructor<T> constructor = clazz.getDeclaredConstructor();
+            if (!constructor.canAccess(null)) {
+                constructor.setAccessible(true);
+            }
+            return constructor.newInstance();
+        } catch (NoSuchMethodException e) {
+            throw new IllegalArgumentException("The default constructor is not found at " + clazz.getName() + ".", e);
+        } catch (InvocationTargetException e) {
+            final Throwable cause = e.getCause();
+            if (cause instanceof RuntimeException) {
+                throw (RuntimeException)cause;
+            } else {
+                throw new RuntimeException(cause);
+            }
+        } catch (InstantiationException | IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    
 
     // インスタンス化させないためコンストラクタをprivateで宣言
     private ReflectionUtil() {}

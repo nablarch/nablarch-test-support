@@ -2,6 +2,7 @@ package nablarch.test.support.reflection;
 
 import org.junit.Test;
 
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
@@ -237,5 +238,50 @@ public class ReflectionUtilTest {
         assertThat(exception.getCause(), is(instanceOf(InvocationTargetException.class)));
         assertThat(exception.getCause().getCause(), is(instanceOf(UnsupportedOperationException.class)));
         assertThat(exception.getCause().getCause().getMessage(), is("test"));
+    }
+
+    /**
+     * 可視性に関係なくデフォルトコンストラクタを使ってインスタンスが生成できること。
+     */
+    @Test
+    public void testNewInstance() {
+        assertThat(ReflectionUtil.newInstance(PublicConstructor.class).text, is("PublicConstructor"));
+        assertThat(ReflectionUtil.newInstance(ProtectedConstructor.class).text, is("ProtectedConstructor"));
+        assertThat(ReflectionUtil.newInstance(PackagePrivateConstructor.class).text, is("PackagePrivateConstructor"));
+        assertThat(ReflectionUtil.newInstance(PrivateConstructor.class).text, is("PrivateConstructor"));
+    }
+
+    /**
+     * デフォルトコンストラクタが存在しない場合は例外をスローすること。
+     */
+    @Test
+    public void testNewInstanceThrowsExceptionIfDefaultConstructorNotFound() {
+        final IllegalArgumentException exception
+                = assertThrows(IllegalArgumentException.class, () -> ReflectionUtil.newInstance(NoDefaultArgConstructor.class));
+        
+        assertThat(exception.getMessage(), is("The default constructor is not found at " + NoDefaultArgConstructor.class.getName() + "."));
+    }
+
+    /**
+     * デフォルトコンストラクタが非チェック例外をスローした場合は、その例外がそのままスローされなおされること。
+     */
+    @Test
+    public void testNewInstanceThrowsExceptionIfDefaultConstructorThrowsRuntimeException() {
+        final UnsupportedOperationException exception
+                = assertThrows(UnsupportedOperationException.class, () -> ReflectionUtil.newInstance(ThrowRuntimeExceptionConstructor.class));
+
+        assertThat(exception.getMessage(), is("test"));
+    }
+
+    /**
+     * デフォルトコンストラクタがチェック例外をスローした場合は、その例外をラップした例外がスローされること。
+     */
+    @Test
+    public void testNewInstanceThrowsExceptionIfDefaultConstructorThrowsException() {
+        final RuntimeException exception
+                = assertThrows(RuntimeException.class, () -> ReflectionUtil.newInstance(ThrowExceptionConstructor.class));
+
+        assertThat(exception.getCause(), is(instanceOf(IOException.class)));
+        assertThat(exception.getCause().getMessage(), is("test"));
     }
 }
