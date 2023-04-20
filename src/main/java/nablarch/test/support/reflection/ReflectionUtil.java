@@ -5,6 +5,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -47,7 +48,9 @@ public class ReflectionUtil {
      * @throws IllegalArgumentException 指定されたフィールドが見つからない場合
      */
     public static <T> T getFieldValue(Class<?> clazz, String fieldName) {
-        return getFieldValue(clazz, null, fieldName);
+        final Field field = obtainDeclaredField(clazz, fieldName)
+                .orElseThrow(() -> createExceptionForClassFieldNotFound(clazz, fieldName));
+        return getFieldValueForce(field, null);
     }
 
     /**
@@ -82,10 +85,22 @@ public class ReflectionUtil {
      * @return 取得したフィールドの値
      * @param <T> フィールドの型
      */
-    @SuppressWarnings("unchecked")
     private static <T> T getFieldValue(Class<?> clazz, Object object, String fieldName) {
+        final Field field = obtainDeclaredField(clazz, fieldName)
+                .orElseThrow(() -> createExceptionForInstanceFieldNotFound(object, fieldName));
+        return getFieldValueForce(field, object);
+    }
+
+    /**
+     * 指定したフィールドの値を強制的に取得する。
+     * @param field 対象のフィールド
+     * @param object フィールドを持つオブジェクト(staticフィールドの場合はnull)
+     * @return フィールドの値
+     * @param <T> フィールドの型
+     */
+    @SuppressWarnings("unchecked")
+    private static <T> T getFieldValueForce(Field field, Object object) {
         try {
-            final Field field = obtainDeclaredField(clazz, object, fieldName);
             if (!field.canAccess(object)) {
                 field.setAccessible(true);
             }
@@ -94,6 +109,31 @@ public class ReflectionUtil {
             // setAccessible(true) でアクセス可にするためこの例外がスローされることはない
             throw new RuntimeException(e);
         }
+    }
+
+    /**
+     * 指定したクラスの指定した{@code static}フィールドに、値を設定する。
+     * <p>
+     * このメソッドは、フィールドの可視性に関係なく値を設定できる。<br>
+     * カプセル化を破壊し、クラス間の静的な依存関係が分からなくなるため、
+     * このメソッドの乱用は避けること<br>
+     * 極力このメソッドを使用しなくてもテストができるようにクラスを設計し、
+     * どうしても可視性を無視して値を設定しなけばテストできない場合にのみ使用すること。
+     * </p>
+     * <p>
+     * 指定されたクラスに指定された{@code static}フィールドが存在しない場合は、
+     * 親クラスを遡ってフィールドを探索する。
+     * </p>
+     *
+     * @param clazz 値を設定するクラス
+     * @param fieldName フィールドの名前
+     * @param value フィールドに設定する値
+     * @throws IllegalArgumentException 指定されたフィールドが存在しない場合
+     */
+    public static void setFieldValue(Class<?> clazz, String fieldName, Object value) {
+        final Field field = obtainDeclaredField(clazz, fieldName)
+                .orElseThrow(() -> createExceptionForClassFieldNotFound(clazz, fieldName));
+        setFieldValueForce(field, null, value);
     }
     
     /**
@@ -116,8 +156,19 @@ public class ReflectionUtil {
      * @throws IllegalArgumentException 指定されたフィールドが存在しない場合
      */
     public static void setFieldValue(Object object, String fieldName, Object value) {
+        final Field field = obtainDeclaredField(object.getClass(), fieldName)
+                .orElseThrow(() -> createExceptionForInstanceFieldNotFound(object, fieldName));
+        setFieldValueForce(field, object, value);
+    }
+
+    /**
+     * 指定したフィールドに強制的に値を設定する。
+     * @param field 対象のフィールド
+     * @param object フィールドを持つオブジェクト（staticフィールドの場合はnull）
+     * @param value 設定する値
+     */
+    private static void setFieldValueForce(Field field, Object object, Object value) {
         try {
-            final Field field = obtainDeclaredField(object.getClass(), object, fieldName);
             if (!field.canAccess(object)) {
                 field.setAccessible(true);
             }
@@ -129,22 +180,40 @@ public class ReflectionUtil {
     }
 
     /**
+     * インスタンスフィールドが見つからない場合の例外を生成する。
+     * @param object 探索対象となったオブジェクト
+     * @param fieldName フィールド名
+     * @return
+     */
+    private static IllegalArgumentException createExceptionForInstanceFieldNotFound(Object object, String fieldName) {
+        return new IllegalArgumentException("The field '" + fieldName + "' is not found in object (" + object + ").");
+    }
+
+    /**
+     * クラスフィールドが見つからない場合の例外を生成する。
+     * @param clazz 探索対象となった最初のクラス
+     * @param fieldName フィールド名
+     * @return 例外
+     */
+    private static IllegalArgumentException createExceptionForClassFieldNotFound(Class<?> clazz, String fieldName) {
+        return new IllegalArgumentException("The field '" + fieldName + "' is not found in class (" + clazz.getName() + ").");
+    }
+
+    /**
      * 指定されたフィールドを親クラスに遡って再帰的に探索して取得する。
      * @param clazz 探索対象のクラス
-     * @param object 探索対象のオブジェクト
      * @param fieldName 探索対象のフィールド名
      * @return 取得した {@link Field} オブジェクト
-     * @throws IllegalArgumentException フィールドが見つからない場合
      */
-    private static Field obtainDeclaredField(Class<?> clazz, Object object, String fieldName) {
+    private static Optional<Field> obtainDeclaredField(Class<?> clazz, String fieldName) {
         try {
-            return clazz.getDeclaredField(fieldName);
+            return Optional.of(clazz.getDeclaredField(fieldName));
         } catch (NoSuchFieldException e) {
             final Class<?> superClass = clazz.getSuperclass();
             if (superClass == null) {
-                throw new IllegalArgumentException("The field '" + fieldName + "' is not found in object (" + object + ").");
+                return Optional.empty();
             } else {
-                return obtainDeclaredField(superClass, object, fieldName);
+                return obtainDeclaredField(superClass, fieldName);
             }
         }
     }

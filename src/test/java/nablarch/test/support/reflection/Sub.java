@@ -6,6 +6,14 @@ public class Sub extends Parent {
     static String PACKAGE_PRIVATE_FIELD = "Sub#PACKAGE_PRIVATE_FIELD";
     private static String PRIVATE_FIELD = "Sub#PRIVATE_FIELD";
     
+    public static void init() {
+        Parent.init();
+        PUBLIC_FIELD = "Sub#PUBLIC_FIELD";
+        PROTECTED_FIELD = "Sub#PROTECTED_FIELD";
+        PACKAGE_PRIVATE_FIELD = "Sub#PACKAGE_PRIVATE_FIELD";
+        PRIVATE_FIELD = "Sub#PRIVATE_FIELD";
+    }
+    
     public String publicField = "Sub#publicField";
     protected String protectedField = "Sub#protectedField";
     String packagePrivateField = "Sub#packagePrivateField";

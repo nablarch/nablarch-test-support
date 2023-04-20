@@ -7,6 +7,14 @@ public class Parent {
     private static String PRIVATE_FIELD = "Parent#PRIVATE_FIELD";
     private static String PARENT_ONLY_FIELD = "Parent#PARENT_ONLY_FIELD";
     
+    public static void init() {
+        PUBLIC_FIELD = "Parent#PUBLIC_FIELD";
+        PROTECTED_FIELD = "Parent#PROTECTED_FIELD";
+        PACKAGE_PRIVATE_FIELD = "Parent#PACKAGE_PRIVATE_FIELD";
+        PRIVATE_FIELD = "Parent#PRIVATE_FIELD";
+        PARENT_ONLY_FIELD = "Parent#PARENT_ONLY_FIELD";
+    }
+    
     public String publicField = "Parent#publicField";
     protected String protectedField = "Parent#protectedField";
     String packagePrivateField = "Parent#packagePrivateField";

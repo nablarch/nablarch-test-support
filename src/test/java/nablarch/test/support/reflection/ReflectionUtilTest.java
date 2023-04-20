@@ -1,9 +1,11 @@
 package nablarch.test.support.reflection;
 
+import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.util.AbstractList;
 import java.util.List;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
@@ -17,6 +19,12 @@ import static org.junit.Assert.assertThrows;
  * @author Tanaka Tomoyuki
  */
 public class ReflectionUtilTest {
+
+    @Before
+    public void setUp() {
+        Parent.init();
+        Sub.init();
+    }
 
     /**
      * 指定されたクラスで定義されたフィールドは可視性に関係なく全て取得できること。
@@ -43,6 +51,17 @@ public class ReflectionUtilTest {
         assertThat(ReflectionUtil.getFieldValue(Sub.class, "PACKAGE_PRIVATE_FIELD"), is("Sub#PACKAGE_PRIVATE_FIELD"));
         assertThat(ReflectionUtil.getFieldValue(Sub.class, "PRIVATE_FIELD"), is("Sub#PRIVATE_FIELD"));
         assertThat(ReflectionUtil.getFieldValue(Sub.class, "PARENT_ONLY_FIELD"), is("Parent#PARENT_ONLY_FIELD"));
+    }
+
+    /**
+     * getFieldValueで指定されたstaticフィールドが存在しない場合は例外がスローされること。
+     */
+    @Test
+    public void testGetFieldValueThrowsExceptionIfNotFoundFieldForClassField() {
+        final IllegalArgumentException exception
+                = assertThrows(IllegalArgumentException.class, () -> ReflectionUtil.getFieldValue(Sub.class, "unknownField"));
+
+        assertThat(exception.getMessage(), is("The field 'unknownField' is not found in class (" + Sub.class.getName() + ")."));
     }
 
     /**
@@ -87,6 +106,56 @@ public class ReflectionUtilTest {
                 = assertThrows(IllegalArgumentException.class, () -> ReflectionUtil.getFieldValue(parent, "unknownField"));
 
         assertThat(exception.getMessage(), is("The field 'unknownField' is not found in object (" + parent + ")."));
+    }
+
+    /**
+     * 指定されたクラスのstaticフィールドに可視性に関係なく値が設定できること。
+     */
+    @Test
+    public void testSetFieldValueForClassField() {
+        ReflectionUtil.setFieldValue(Parent.class, "PUBLIC_FIELD", "public-field");
+        ReflectionUtil.setFieldValue(Parent.class, "PROTECTED_FIELD", "protected-field");
+        ReflectionUtil.setFieldValue(Parent.class, "PACKAGE_PRIVATE_FIELD", "package-private-field");
+        ReflectionUtil.setFieldValue(Parent.class, "PRIVATE_FIELD", "private-field");
+
+        assertThat(ReflectionUtil.getFieldValue(Parent.class, "PUBLIC_FIELD"), is("public-field"));
+        assertThat(ReflectionUtil.getFieldValue(Parent.class, "PROTECTED_FIELD"), is("protected-field"));
+        assertThat(ReflectionUtil.getFieldValue(Parent.class, "PACKAGE_PRIVATE_FIELD"), is("package-private-field"));
+        assertThat(ReflectionUtil.getFieldValue(Parent.class, "PRIVATE_FIELD"), is("private-field"));
+    }
+
+    /**
+     * サブクラスのstaticフィールドに対してsetFieldValueを使ったときのテスト。
+     * <ul>
+     *   <li>オーバーライドされたフィールドに設定できること</li>
+     *   <li>親クラスのフィールドも設定できること</li>
+     * </ul>
+     */
+    @Test
+    public void testSetFieldValueAtSubClassForClassField() {
+        ReflectionUtil.setFieldValue(Sub.class, "PUBLIC_FIELD", "public-field");
+        ReflectionUtil.setFieldValue(Sub.class, "PROTECTED_FIELD", "protected-field");
+        ReflectionUtil.setFieldValue(Sub.class, "PACKAGE_PRIVATE_FIELD", "package-private-field");
+        ReflectionUtil.setFieldValue(Sub.class, "PRIVATE_FIELD", "private-field");
+        ReflectionUtil.setFieldValue(Sub.class, "PARENT_ONLY_FIELD", "parent-only-field");
+
+        assertThat(ReflectionUtil.getFieldValue(Sub.class, "PUBLIC_FIELD"), is("public-field"));
+        assertThat(ReflectionUtil.getFieldValue(Sub.class, "PROTECTED_FIELD"), is("protected-field"));
+        assertThat(ReflectionUtil.getFieldValue(Sub.class, "PACKAGE_PRIVATE_FIELD"), is("package-private-field"));
+        assertThat(ReflectionUtil.getFieldValue(Sub.class, "PRIVATE_FIELD"), is("private-field"));
+        assertThat(ReflectionUtil.getFieldValue(Sub.class, "PARENT_ONLY_FIELD"), is("parent-only-field"));
+    }
+
+    /**
+     * setFieldValueで指定されたstaticフィールドが存在しない場合は例外がスローされること。
+     */
+    @Test
+    public void testSetFieldValueThrowsExceptionIfNotFoundFieldForClassField() {
+        final IllegalArgumentException exception
+                = assertThrows(IllegalArgumentException.class,
+                () -> ReflectionUtil.setFieldValue(Sub.class, "unknownField", "value"));
+
+        assertThat(exception.getMessage(), is("The field 'unknownField' is not found in class (" + Sub.class.getName() + ")."));
     }
 
     /**
@@ -283,5 +352,16 @@ public class ReflectionUtilTest {
 
         assertThat(exception.getCause(), is(instanceOf(IOException.class)));
         assertThat(exception.getCause().getMessage(), is("test"));
+    }
+
+    /**
+     * 抽象クラスのインスタンスを生成しようとした場合は例外がスローされ、その例外をラップした例外がスローされること。
+     */
+    @Test
+    public void testNewInstanceThrowsExceptionIfAbstractClassSpecified() {
+        final RuntimeException exception
+                = assertThrows(RuntimeException.class, () -> ReflectionUtil.newInstance(AbstractClass.class));
+
+        assertThat(exception.getCause(), is(instanceOf(InstantiationException.class)));
     }
 }
