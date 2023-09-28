@@ -1,11 +1,17 @@
 package nablarch.test.support.db.helper;
 
-import java.lang.reflect.Field;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
+import nablarch.core.db.connection.ConnectionFactory;
+import nablarch.core.repository.di.DiContainer;
+import nablarch.core.util.StringUtil;
+import org.eclipse.persistence.internal.jpa.config.persistenceunit.PersistenceUnitImpl;
+import org.eclipse.persistence.internal.jpa.deployment.SEPersistenceUnitInfo;
+import org.eclipse.persistence.jpa.JpaHelper;
+import org.eclipse.persistence.jpa.config.PersistenceUnit;
+import org.eclipse.persistence.jpa.config.RuntimeFactory;
+import org.eclipse.persistence.sessions.DatabaseSession;
+import org.eclipse.persistence.tools.schemaframework.FieldDefinition;
+import org.eclipse.persistence.tools.schemaframework.SchemaManager;
+import org.eclipse.persistence.tools.schemaframework.TableDefinition;
 
 import javax.persistence.Column;
 import javax.persistence.EntityManager;
@@ -17,20 +23,12 @@ import javax.persistence.Temporal;
 import javax.persistence.Transient;
 import javax.persistence.spi.PersistenceUnitTransactionType;
 import javax.sql.DataSource;
-
-import org.eclipse.persistence.internal.jpa.config.persistenceunit.PersistenceUnitImpl;
-import org.eclipse.persistence.internal.jpa.deployment.SEPersistenceUnitInfo;
-import org.eclipse.persistence.jpa.JpaHelper;
-import org.eclipse.persistence.jpa.config.PersistenceUnit;
-import org.eclipse.persistence.jpa.config.RuntimeFactory;
-import org.eclipse.persistence.sessions.DatabaseSession;
-import org.eclipse.persistence.tools.schemaframework.FieldDefinition;
-import org.eclipse.persistence.tools.schemaframework.SchemaManager;
-import org.eclipse.persistence.tools.schemaframework.TableDefinition;
-
-import nablarch.core.db.connection.ConnectionFactory;
-import nablarch.core.repository.di.DiContainer;
-import nablarch.core.util.StringUtil;
+import java.lang.reflect.Field;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
 
 public class VariousDbTestHelper {
 
@@ -131,14 +129,27 @@ public class VariousDbTestHelper {
                 final Temporal temporal = field.getAnnotation(Temporal.class);
                 if (temporal != null) {
                     switch (temporal.value()) {
+                        /*
+                         * SQLServer の分岐について
+                         * 4.0.0 未満の Eclipselink は、 setType で設定された型を元に DB のカラムの型を決定するが、
+                         * java.sql.Date, java.sql.Time の場合も全て DATETIME 型でカラムを生成してしまう。
+                         * このため、 SQLServer の場合は明示的に setTypeDefinition で型を設定している。
+                         * なお、最新の 4.0.0 以上ではそれぞれ DATE, TIME 型でカラムが生成されるようになっている。
+                         */
                         case TIMESTAMP:
                             fd.setType(java.sql.Timestamp.class);
                             break;
                         case DATE:
                             fd.setType(java.sql.Date.class);
+                            if (isSqlServer()) {
+                                fd.setTypeDefinition("date");
+                            }
                             break;
                         case TIME:
                             fd.setType(java.sql.Time.class);
+                            if (isSqlServer()) {
+                                fd.setTypeDefinition("time");
+                            }
                             break;
                     }
                 } else if (isSqlServerBinaryType(field)) {
@@ -207,10 +218,14 @@ public class VariousDbTestHelper {
     }
 
     private static boolean isSqlServerBinaryType(Field field) {
+        return field.getType().equals(byte[].class) && isSqlServer();
+    }
+    
+    private static boolean isSqlServer() {
         try {
-            return field.getType().equals(byte[].class) && getTargetDatabase() == TargetDb.Db.SQL_SERVER;
+            return getTargetDatabase() == TargetDb.Db.SQL_SERVER;
         } catch (Exception e) {
-            throw new RuntimeException();
+            throw new RuntimeException(e);
         }
     }
 
@@ -315,6 +330,27 @@ public class VariousDbTestHelper {
             for (Object entity : array) {
                 em.merge(entity);
             }
+            em.getTransaction()
+                    .commit();
+        } catch (Exception e) {
+            em.getTransaction()
+                    .rollback();
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * レコードを削除する。
+     *
+     * @param entity Entityオブジェクト
+     *               findで取得したEntityManagerの管理下にあるオブジェクトを渡すこと。
+     *               newしたオブジェクトを渡した場合削除できません。
+     */
+    public static void delete(Object entity) {
+        em.getTransaction()
+                .begin();
+        try {
+            em.remove(entity);
             em.getTransaction()
                     .commit();
         } catch (Exception e) {
