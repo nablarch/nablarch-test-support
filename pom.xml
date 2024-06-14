@@ -51,7 +51,7 @@
     <dependency>
       <groupId>com.nablarch.dev</groupId>
       <artifactId>nablarch-test-support-hereis</artifactId>
-      <version>1.0.0</version>
+      <version>5-NEXT-SNAPSHOT</version>
     </dependency>
 
     <dependency>
