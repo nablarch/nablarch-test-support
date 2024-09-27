@@ -5,7 +5,6 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
-import java.util.AbstractList;
 import java.util.List;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
